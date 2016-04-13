@@ -1,5 +1,3 @@
-$cnt = 0
-
 def calc arr
   operators = %w(+ - *)
   stack = []
