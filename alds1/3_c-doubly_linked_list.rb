@@ -1,7 +1,7 @@
 class List
-  def initialize n
-    @first = ListItem.new n
-    @last = @first
+  def initialize
+    @first = nil
+    @last = nil
   end
 
   def [] index
@@ -9,9 +9,7 @@ class List
 
     # リストをたぐる
     index.times {|item|
-      if current_item.next.nil?
-        raise '不正' + current_item.n
-      end
+      return nil if current_item.next.nil?
       current_item = current_item.next
     }
 
@@ -20,27 +18,18 @@ class List
 
   def insert val
     new_item = ListItem.new val
-
-    if @first.nil?
-      @first = new_item
-      @last = new_item
-    else
-      new_item.next = @first
-      @first.prev = new_item
-      @first = new_item
-    end
+    link new_item, @first
+    @first = new_item
+    @last ||= new_item
   end
 
   def search target
     current_item = @first
 
+    # 早くしたい場合はここをちゃんとしたサーチにする
     loop do
-      if  current_item.nil?
-        return nil
-      end
-      if current_item.n == target
-        return current_item
-      end
+      return nil          if current_item.nil?
+      return current_item if current_item.value == target
       current_item = current_item.next
     end
   end
@@ -49,69 +38,68 @@ class List
     target_item = search target
     return false if target_item.nil?
 
-    # 削除処理
-    prev_item = target_item.prev
-    next_item = target_item.next
-
-    prev_item.next = next_item unless prev_item.nil?
-    next_item.prev = prev_item unless next_item.nil?
+    # 削除対象を抜いたリンクにする
+    link target_item.prev, target_item.next
 
     # 削除対象が先頭の時
-    if prev_item.nil?
-      @first = next_item
-    end
+    @first = target_item.next if target_item.prev.nil?
 
     # 削除対象が最後の時
-    if next_item.nil?
-      @last = prev_item
-    end
+    @last = target_item.prev if target_item.next.nil?
 
     return true
   end
 
   def delete_first
-    if @first.next.nil?
-      @first = nil
-      @last = nil
-    else
-      @first = @first.next
-      @first.prev = nil
-    end
+    return false if @first.nil?
+    @first = @first.next
+    link nil, @first
+    empty if @first.nil?
+    true
   end
 
   def delete_last
-    if @last.prev.nil?
-      @last = nil
-      @first = nil
-    else
-      @last = @last.prev
-      @last.next = nil
-    end
+
+    return false if @last.nil?
+    @last = @last.prev
+    link @last, nil
+    empty if @last.nil?
+    true
   end
 
   def print delimiter = ' '
     print_items = []
     current_item = @first
     until current_item.nil?
-      print_items << current_item.n
+      print_items << current_item.value
       current_item = current_item.next
     end
     puts print_items.join delimiter
   end
 
+  private
+
+  def link first, second
+    first.next = second unless first.nil?
+    second.prev = first unless second.nil?
+  end
+
+  def empty
+    @first = @last = nil
+  end
+
   class ListItem
-    def initialize n
-      @n = n
+    def initialize value
+      @value = value
       @next = nil
       @prev = nil
     end
-    attr_accessor :next, :prev, :n
+    attr_accessor :next, :prev, :value
   end
 end
 
 def main commands
-  # とりあえず最初は必ずinsertと考える
-  list = List.new commands.shift.split(' ')[1]
+  list = List.new
 
   commands.each do |raw_command|
     #list.print
