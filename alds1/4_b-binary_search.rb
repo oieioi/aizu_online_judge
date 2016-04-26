@@ -1,35 +1,28 @@
-def binary_search array, key
-  #puts "#{key} in #{array.join ','}?"
-  pivot = array.size / 2
+def binary_search array, key, pivot, head_index
   targets = array.dup
-  loop do
-    # 真ん中あたりを調べる
-    #sleep 0.1
-    #puts "#{targets.join(',')} の #{pivot}番目は #{targets[pivot]}"
-    if targets.size == 1 && targets[0] != key
-      return nil
-    elsif targets[pivot].nil?
-      return nil
-    elsif targets[pivot] == key
-      # bingo
-      # TODO: ほんとはindexを返さす
-      return true
-    elsif targets[pivot] > key
-      #pivotより左を調べる
-      targets = targets[0..(pivot - 1)]
-      pivot = targets.size / 2
-    elsif targets[pivot] < key
-      targets = targets[(pivot + 1)..targets.size]
-      pivot = targets.size / 2
-    else
-      return nil
-    end
+  #puts "#{key} in [#{targets.join(',')}][#{pivot}] is #{targets[pivot]}"
+  if (targets.size == 1) && (targets[0] != key)
+    return nil
+  elsif targets.size == 0
+    return nil
+  elsif targets[pivot] == key
+    return pivot + head_index
+  elsif targets[pivot] > key
+    #pivotより左を調べる
+    next_target = targets[0..(pivot - 1)]
+    binary_search(next_target, key, next_target.size / 2, 0)
+  elsif targets[pivot] < key
+    #pivotより右を調べる
+    next_target = targets[(pivot + 1)..targets.size]
+    binary_search(next_target, key, next_target.size / 2, pivot)
+  else
+    raise "おかしいで #{array.join(',')}, #{key} #{pivot} #{head_index}"
   end
 end
 
 def main size, array, keys_size, keys
   puts keys.select{|key|
-    binary_search array, key
+    not binary_search(array, key, array.size / 2, 0).nil?
   }.size
 
 end
