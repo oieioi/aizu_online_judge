@@ -24,12 +24,12 @@ end
 def search baggages, track_size
   min = baggages.max
   max = baggages.reduce(0) {|sum, item| sum + item}
-  (min..max).each {|min_weight| 
-    can_load = can_load? baggages, track_size, min_weight
-    #puts "つめた？#{can_load}"
-    return min_weight if can_load
-  }
-  raise 'へん'
+  #(min..max).each {|min_weight|
+  #  can_load = can_load? baggages, track_size, min_weight
+  #  #puts "つめた？#{can_load}"
+  #  return min_weight if can_load
+  #}
+  (min..max).bsearch{|min_weight| can_load? baggages, track_size, min_weight}
 end
 
 # 最小値は与えられる荷物の重さの最大値
