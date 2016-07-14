@@ -7,7 +7,7 @@ module Main
     unless @@memo[index].nil?
       return @@memo[index][sum] unless @@memo[index][sum].nil?
     else
-      @@memo[index] = []
+      @@memo[index] = {}
     end
 
     if sum == 0
@@ -15,7 +15,6 @@ module Main
     elsif index >= raw_elements_length
       false
     else
-      p index
       @@memo[index][sum] = can_assemble?(elements, index + 1, sum, raw_elements_length) || can_assemble?(elements, index + 1, sum - elements[index], raw_elements_length)
       @@memo[index][sum]
     end
